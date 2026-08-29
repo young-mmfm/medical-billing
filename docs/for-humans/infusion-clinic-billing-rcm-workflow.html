@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A practical explanation of how infusion-clinic billing and revenue-cycle management operate today." />
+    <title>Infusion Clinic Billing &amp; RCM Workflow</title>
+    <style>
+      :root {
+        --ink: #182333;
+        --muted: #5e6c7d;
+        --canvas: #f5f8fc;
+        --paper: #ffffff;
+        --line: #dce5ef;
+        --navy: #0d2e4f;
+        --blue: #1967c9;
+        --sky: #eaf4ff;
+        --teal: #087b73;
+        --mint: #e6f7f4;
+        --gold: #ab6b00;
+        --sand: #fff7e7;
+        --red: #b53b45;
+        --rose: #fff0f2;
+        --violet: #6545a5;
+        --lavender: #f3efff;
+        --shadow: 0 18px 45px rgba(23, 43, 77, 0.08);
+        --radius: 18px;
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: var(--canvas);
+        font: 16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      a { color: inherit; }
+      .wrap { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+      .eyebrow {
+        margin: 0 0 12px;
+        color: var(--blue);
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      h1, h2, h3, p { margin-top: 0; }
+      h1 { max-width: 790px; margin-bottom: 19px; color: #fff; font-size: clamp(2.45rem, 6vw, 4.9rem); line-height: 1.02; letter-spacing: -0.055em; }
+      h2 { margin-bottom: 12px; font-size: clamp(1.65rem, 3.2vw, 2.45rem); line-height: 1.1; letter-spacing: -0.035em; }
+      h3 { margin-bottom: 7px; font-size: 1.05rem; line-height: 1.25; }
+      .lede { max-width: 715px; margin-bottom: 0; color: #d9e9f8; font-size: 1.12rem; }
+      .section-copy { max-width: 760px; color: var(--muted); }
+      .kicker { color: var(--blue); font-weight: 750; }
+
+      header {
+        overflow: hidden;
+        color: #fff;
+        background: linear-gradient(120deg, #0b2745 0%, #0e416d 58%, #155c8d 100%);
+      }
+      .hero { position: relative; padding: 76px 0 64px; }
+      .hero::after {
+        position: absolute;
+        right: -80px;
+        bottom: -154px;
+        width: 430px;
+        height: 430px;
+        border: 50px solid rgba(128, 211, 243, 0.15);
+        border-radius: 50%;
+        content: "";
+      }
+      .hero-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+      .hero-chip { z-index: 1; padding: 7px 11px; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; color: #d8ebfa; background: rgba(255,255,255,.08); font-size: 0.83rem; }
+      .nav-shell { border-top: 1px solid rgba(255,255,255,.16); background: rgba(5, 27, 48, .24); }
+      nav { display: flex; gap: 2px; overflow-x: auto; padding: 0; white-space: nowrap; }
+      nav a { padding: 14px 13px; color: #d9eaf7; font-size: .8rem; font-weight: 700; text-decoration: none; }
+      nav a:hover { color: #fff; background: rgba(255,255,255,.09); }
+
+      main { padding: 55px 0 82px; }
+      section { margin-top: 76px; }
+      section:first-child { margin-top: 0; }
+      .panel, .card, .callout, .example, .diagram, table { background: var(--paper); box-shadow: var(--shadow); }
+      .panel, .diagram { border: 1px solid var(--line); border-radius: var(--radius); }
+      .panel { padding: clamp(22px, 4vw, 38px); }
+      .section-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+      .section-head > div:last-child { flex: 1 1 520px; }
+      .number { display: inline-grid; width: 35px; height: 35px; margin-bottom: 15px; place-items: center; border-radius: 10px; color: var(--blue); background: var(--sky); font-size: .85rem; font-weight: 800; }
+
+      .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+      .quick-card { min-height: 165px; padding: 20px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
+      .quick-card .num { display: block; margin-bottom: 18px; color: var(--blue); font-family: Georgia, serif; font-size: 1.7rem; line-height: 1; }
+      .quick-card p { margin: 0; color: var(--muted); font-size: .89rem; }
+
+      .diagram { overflow: hidden; padding: 26px; }
+      .diagram-title { margin-bottom: 18px; color: var(--navy); font-size: .85rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+      .flow { display: grid; grid-template-columns: repeat(9, minmax(105px, 1fr)); align-items: stretch; min-width: 1010px; }
+      .flow-wrap { overflow-x: auto; padding-bottom: 6px; }
+      .flow-step { position: relative; min-height: 135px; padding: 14px; border: 1px solid var(--line); background: #fff; }
+      .flow-step:first-child { border-radius: 11px 0 0 11px; }
+      .flow-step:last-child { border-radius: 0 11px 11px 0; }
+      .flow-step:not(:last-child)::after { position: absolute; z-index: 2; top: 50%; right: -7px; width: 12px; height: 12px; border-top: 2px solid #8fa3b7; border-right: 2px solid #8fa3b7; background: #fff; transform: translateY(-50%) rotate(45deg); content: ""; }
+      .flow-no { display: block; margin-bottom: 10px; color: var(--blue); font-size: .72rem; font-weight: 800; }
+      .flow-step strong { display: block; font-size: .86rem; line-height: 1.2; }
+      .flow-step small { display: block; margin-top: 7px; color: var(--muted); font-size: .72rem; line-height: 1.35; }
+      .legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 18px 0 0; color: var(--muted); font-size: .8rem; }
+      .legend b { display: inline-block; width: 10px; height: 10px; margin-right: 5px; border-radius: 50%; }
+
+      .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+      .card { padding: 24px; border: 1px solid var(--line); border-radius: 15px; }
+      .card p:last-child { margin-bottom: 0; }
+      .card ul, .stage ul { margin: 11px 0 0; padding-left: 19px; color: var(--muted); font-size: .91rem; }
+      .card li + li, .stage li + li { margin-top: 7px; }
+      .icon { display: grid; width: 36px; height: 36px; margin-bottom: 14px; place-items: center; border-radius: 10px; color: var(--blue); background: var(--sky); font-weight: 900; }
+      .soft-blue { background: var(--sky); }
+      .soft-mint { background: var(--mint); }
+      .soft-sand { background: var(--sand); }
+      .soft-rose { background: var(--rose); }
+      .soft-lavender { background: var(--lavender); }
+
+      .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 15px; box-shadow: var(--shadow); }
+      table { width: 100%; border-spacing: 0; box-shadow: none; text-align: left; }
+      th, td { padding: 16px 17px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      tr:last-child td { border-bottom: 0; }
+      th { color: var(--navy); background: #f8fbff; font-size: .76rem; letter-spacing: .055em; text-transform: uppercase; }
+      td { color: var(--muted); font-size: .9rem; }
+      td strong { color: var(--ink); }
+      .tag { display: inline-block; padding: 3px 7px; border-radius: 999px; font-size: .72rem; font-weight: 800; line-height: 1.25; }
+      .tag.web { color: #155793; background: #e7f3ff; }
+      .tag.desktop { color: #6545a5; background: #f0ebff; }
+      .tag.both { color: #087b73; background: #e6f7f4; }
+      .tag.edi { color: #955a00; background: #fff2d8; }
+
+      .stages { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .stage { position: relative; overflow: hidden; padding: 23px 23px 22px 77px; border: 1px solid var(--line); border-radius: 15px; background: #fff; box-shadow: var(--shadow); }
+      .stage::before { position: absolute; top: 22px; left: 21px; display: grid; width: 37px; height: 37px; place-items: center; border-radius: 11px; color: var(--blue); background: var(--sky); font-size: .82rem; font-weight: 800; content: attr(data-step); }
+      .stage p { margin-bottom: 0; color: var(--muted); font-size: .91rem; }
+      .stage .micro { margin-top: 11px; color: #35506c; font-size: .81rem; font-weight: 700; }
+
+      .example { overflow: hidden; border: 1px solid #bfd7ef; border-radius: var(--radius); }
+      .example-head { padding: 23px 27px; color: #fff; background: linear-gradient(110deg, #14558c, #277bb8); }
+      .example-head h3 { margin: 0; font-size: 1.3rem; }
+      .example-head p { margin: 5px 0 0; color: #ddecf8; font-size: .9rem; }
+      .money-grid { display: grid; grid-template-columns: 1.18fr .82fr; }
+      .money-main { padding: 27px; }
+      .money-steps { display: grid; gap: 10px; }
+      .money-step { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; padding: 12px 13px; border-radius: 10px; background: #f7fbff; }
+      .money-step .circle { display: grid; width: 26px; height: 26px; place-items: center; border-radius: 50%; color: #fff; background: var(--blue); font-size: .72rem; font-weight: 800; }
+      .money-step span { color: #536b83; font-size: .86rem; }
+      .money-step b { color: var(--navy); font-size: .92rem; }
+      .money-side { padding: 27px; background: #edf6ff; }
+      .money-side h4 { margin: 0 0 12px; color: var(--navy); font-size: .9rem; }
+      .formula { margin: 13px 0; padding: 13px; border: 1px dashed #9cc2e3; border-radius: 10px; color: #315676; background: #fff; font-size: .85rem; }
+      .final { padding: 12px 13px; border-radius: 10px; color: #075d57; background: var(--mint); font-size: .88rem; font-weight: 800; }
+
+      .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 0; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+      .compare > div { padding: 28px; background: #fff; }
+      .compare > div + div { border-left: 1px solid var(--line); background: #f9fcff; }
+      .compare h3 { font-size: 1.25rem; }
+      .compare ul { padding-left: 20px; color: var(--muted); font-size: .9rem; }
+      .compare li + li { margin-top: 9px; }
+
+      .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+      .status-card { padding: 20px; border-radius: 14px; border: 1px solid var(--line); background: #fff; }
+      .status-card h3 { display: flex; align-items: center; gap: 8px; }
+      .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--teal); }
+      .status-card p { margin: 0; color: var(--muted); font-size: .88rem; }
+      .status-card.rework .dot { background: var(--gold); }
+      .status-card.issue .dot { background: var(--red); }
+
+      .callout { display: grid; grid-template-columns: auto 1fr; gap: 17px; margin-top: 22px; padding: 19px 21px; border: 1px solid #f0dcaf; border-radius: 14px; color: #624c22; background: var(--sand); }
+      .callout strong { color: #7a5300; }
+      .callout p { margin: 0; font-size: .9rem; }
+      .callout .mark { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; color: #885a00; background: #ffe6a8; font-weight: 900; }
+
+      .balance-map { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 12px; padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }
+      .balance-box { min-height: 140px; padding: 19px; border-radius: 13px; }
+      .balance-box h3 { font-size: 1rem; }
+      .balance-box p { margin: 0; color: var(--muted); font-size: .86rem; }
+      .balance-box b { display: block; margin-top: 13px; color: var(--navy); font-size: 1.2rem; }
+      .balance-arrow { color: #6f879e; font-size: 1.7rem; }
+
+      .report-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; }
+      .metric { padding: 19px; border: 1px solid var(--line); border-radius: 13px; background: #fff; box-shadow: var(--shadow); }
+      .metric b { display: block; margin-bottom: 7px; color: var(--navy); font-size: .93rem; }
+      .metric p { margin: 0; color: var(--muted); font-size: .82rem; }
+
+      .glossary { columns: 2; column-gap: 28px; }
+      .term { break-inside: avoid; margin-bottom: 17px; }
+      .term dt { color: var(--navy); font-size: .88rem; font-weight: 800; }
+      .term dd { margin: 3px 0 0; color: var(--muted); font-size: .86rem; }
+      footer { padding: 26px 0 42px; color: #687789; font-size: .8rem; }
+      footer .wrap { padding-top: 20px; border-top: 1px solid var(--line); }
+
+      @media (max-width: 900px) {
+        .quick-grid, .report-grid { grid-template-columns: repeat(2, 1fr); }
+        .money-grid { grid-template-columns: 1fr; }
+        .status-grid { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 700px) {
+        .wrap { width: min(100% - 28px, 1160px); }
+        .hero { padding: 55px 0 47px; }
+        main { padding-top: 38px; }
+        section { margin-top: 56px; }
+        .section-head, .two-col, .stages, .compare { display: block; }
+        .section-head > div:last-child { margin-top: 18px; }
+        .two-col > *, .stages > *, .compare > * { margin-bottom: 14px; }
+        .compare > div + div { border-top: 1px solid var(--line); border-left: 0; }
+        .quick-grid { grid-template-columns: 1fr 1fr; }
+        .balance-map { grid-template-columns: 1fr; }
+        .balance-arrow { transform: rotate(90deg); text-align: center; }
+        .glossary { columns: 1; }
+        th, td { min-width: 150px; padding: 13px; }
+      }
+      @media print {
+        body { background: #fff; font-size: 11px; }
+        header { background: #0d2e4f !important; }
+        nav { display: none; }
+        .hero { padding: 34px 0; }
+        main { padding: 28px 0; }
+        section { margin-top: 36px; break-inside: avoid; }
+        .panel, .card, .callout, .example, .diagram, table, .stage, .metric, .status-card { box-shadow: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap hero">
+        <p class="eyebrow" style="color:#8bd5ff">Current-state primer</p>
+        <h1>How an infusion clinic gets paid</h1>
+        <p class="lede">A practical guide to the clinical, billing, payer, patient, and cash workflows that make up infusion-clinic revenue cycle management today.</p>
+        <div class="hero-meta">
+          <span class="hero-chip">From scheduled treatment to final balance</span>
+          <span class="hero-chip">Illustrative examples, not billing advice</span>
+          <span class="hero-chip">Current operating workflow</span>
+        </div>
+      </div>
+      <div class="nav-shell">
+        <nav class="wrap" aria-label="Page sections">
+          <a href="#overview">Overview</a>
+          <a href="#systems">People &amp; tools</a>
+          <a href="#workflow">Claim lifecycle</a>
+          <a href="#adjudication">Adjudication &amp; AR</a>
+          <a href="#patient">Patient billing</a>
+          <a href="#exceptions">Exceptions</a>
+          <a href="#reconciliation">Reconciliation</a>
+          <a href="#vendor">Vendor boundaries</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section id="overview">
+        <div class="section-head">
+          <div><span class="number">01</span><h2>The operating model, in one view</h2></div>
+          <p class="section-copy">An infusion visit produces clinical documentation, billable services, a payer claim, and eventually a patient balance. These progress on separate clocks and must be tied back together.</p>
+        </div>
+        <div class="panel">
+          <div class="quick-grid">
+            <article class="quick-card"><span class="num">1</span><h3>Care happens</h3><p>The clinician documents what was ordered, delivered, observed, and completed in the EMR.</p></article>
+            <article class="quick-card"><span class="num">2</span><h3>Services become charges</h3><p>Drug, supplies, administration, and related services are converted into code-level charges.</p></article>
+            <article class="quick-card"><span class="num">3</span><h3>The payer decides</h3><p>A clean claim is sent, processed under the member’s benefits and the clinic’s contract, then paid or denied.</p></article>
+            <article class="quick-card"><span class="num">4</span><h3>Balances are resolved</h3><p>Payments, contractual adjustments, patient responsibility, follow-up, and accounting records are reconciled.</p></article>
+          </div>
+        </div>
+
+        <div class="diagram" style="margin-top:22px">
+          <div class="diagram-title">End-to-end cycle</div>
+          <div class="flow-wrap">
+            <div class="flow">
+              <div class="flow-step"><span class="flow-no">PRE-SERVICE</span><strong>Schedule &amp; verify</strong><small>Eligibility, benefits, authorization, estimate</small></div>
+              <div class="flow-step"><span class="flow-no">VISIT</span><strong>Document care</strong><small>Orders, drug, dose, administration time</small></div>
+              <div class="flow-step"><span class="flow-no">DAY 0–3</span><strong>Capture charges</strong><small>Code and check chart-to-charge completeness</small></div>
+              <div class="flow-step"><span class="flow-no">DAY 1–5</span><strong>Scrub claim</strong><small>Find data and rule failures before submission</small></div>
+              <div class="flow-step"><span class="flow-no">SUBMIT</span><strong>Transmit batch</strong><small>Through clearinghouse or direct payer route</small></div>
+              <div class="flow-step"><span class="flow-no">PAYER</span><strong>Adjudicate</strong><small>Apply coverage, authorization, contract, benefits</small></div>
+              <div class="flow-step"><span class="flow-no">POST</span><strong>Post ERA &amp; EFT</strong><small>Apply payment, adjustment, and patient amount</small></div>
+              <div class="flow-step"><span class="flow-no">FOLLOW-UP</span><strong>Work AR</strong><small>Resolve denials, underpayments, missing claims</small></div>
+              <div class="flow-step"><span class="flow-no">CLOSE</span><strong>Bill patient &amp; reconcile</strong><small>Collect, refund or credit, and report</small></div>
+            </div>
+          </div>
+          <p class="legend"><span><b style="background:#1967c9"></b>clinic / billing work</span><span><b style="background:#087b73"></b>payer decision</span><span><b style="background:#ab6b00"></b>patient money and follow-up</span></p>
+        </div>
+      </section>
+
+      <section id="systems">
+        <div class="section-head">
+          <div><span class="number">02</span><h2>Who does what, and where the work lives</h2></div>
+          <p class="section-copy">The workflow crosses clinical and financial systems. No single screen is necessarily the complete record; teams move among the EMR, billing platform, payer sites, and payment records.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Participant / system</th><th>Primary responsibility</th><th>Typical data handled</th><th>How staff usually access it</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Clinic scheduling &amp; financial clearance</strong></td><td>Register the patient, confirm benefits, pursue authorization, explain likely payment.</td><td>Demographics, insurance card, referral, authorization number, benefit details.</td><td><span class="tag both">Web or desktop</span></td></tr>
+              <tr><td><strong>EMR / EHR</strong></td><td>Clinical system of record: order, administration record, nursing notes, medication details.</td><td>Diagnosis, drug/dose/units, route, start/stop times, wastage, signatures.</td><td><span class="tag both">Web or desktop</span></td></tr>
+              <tr><td><strong>Practice-management / billing system</strong></td><td>Turn charges into claims; hold insurance and patient accounts receivable; post remittances.</td><td>Charges, claim edits, submission status, payments, adjustments, balances.</td><td><span class="tag both">Web or desktop</span></td></tr>
+              <tr><td><strong>Clearinghouse</strong></td><td>Format, route, and track electronic transactions between the clinic and many payers.</td><td>837 claims, acknowledgments, claim status, 835 remittances.</td><td><span class="tag web">Web portal</span> <span class="tag edi">Background EDI</span></td></tr>
+              <tr><td><strong>Payer portal / call center</strong></td><td>Provide payer-specific eligibility, authorization, claim status, payment detail, and appeals tools.</td><td>Member benefits, status, medical policy, denial detail, appeal requirements.</td><td><span class="tag web">Web portal</span> <span class="tag web">Phone</span></td></tr>
+              <tr><td><strong>Payment processor &amp; bank</strong></td><td>Accept card/ACH/check payments and receive payer EFT deposits.</td><td>Patient deposits, refunds, card settlements, EFT trace numbers.</td><td><span class="tag web">Web portal</span> <span class="tag desktop">Terminal / lockbox</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="two-col" style="margin-top:22px">
+          <article class="card soft-blue"><div class="icon">E</div><h3>EMR documentation is the clinical source</h3><p>For an infusion, the record commonly includes the order and diagnosis, drug name and NDC or inventory reference, administered dose and units, route, waste, administration times, nursing documentation, and any required signatures. Billing cannot safely assume a scheduled infusion was actually delivered as planned.</p></article>
+          <article class="card soft-mint"><div class="icon" style="color:#087b73;background:#d2f1eb">$</div><h3>The billing system is the financial source</h3><p>It holds the charge ledger, submitted claims, payer and patient balances, remittance posting, collection notes, adjustments, and reporting. It is where the clinic determines what is still owed and by whom.</p></article>
+        </div>
+      </section>
+
+      <section id="workflow">
+        <div class="section-head">
+          <div><span class="number">03</span><h2>From treatment record to submitted claim</h2></div>
+          <p class="section-copy">Early steps aim to make the claim match the care delivered, coverage requirements, and payer formatting rules before the payer ever sees it.</p>
+        </div>
+        <div class="stages">
+          <article class="stage" data-step="01"><h3>Registration, eligibility, and authorization</h3><p>Before service, staff validate identity and coverage, determine whether the clinic is in-network, check active benefits, and identify referral or prior-authorization requirements. The authorization must align with the planned drug, dates, place of service, units, and payer rules.</p><p class="micro">Output: a financially cleared appointment, an exception queue, or an informed patient discussion.</p></article>
+          <article class="stage" data-step="02"><h3>Clinical documentation in the EMR</h3><p>The treating team confirms the order and records the actual care. Variations matter: a treatment may be held, dose-reduced, wasted, split across days, or associated with a different diagnosis than expected.</p><p class="micro">Output: a signed, billable treatment record with enough support for the codes.</p></article>
+          <article class="stage" data-step="03"><h3>Charge capture and coding</h3><p>Charges may flow from the EMR automatically, be entered from an infusion worksheet, or be reviewed by a charge team. The clinic selects or verifies diagnosis codes, drug/supply codes, administration codes, units, modifiers, dates, rendering provider, and place of service.</p><p class="micro">Output: charge lines that describe what occurred and can be billed under payer rules.</p></article>
+          <article class="stage" data-step="04"><h3>Charge review and claim scrubbing</h3><p>Rules check for missing demographics, inactive coverage, invalid coding combinations, duplicate charges, unit mismatches, required authorization, timely-filing risk, and payer-specific edits. A failed edit becomes a work item for a biller, coder, clinical team, or registration staff member.</p><p class="micro">Output: a clean claim or a corrected charge / registration record.</p></article>
+          <article class="stage" data-step="05"><h3>Claim creation, batching, and submission</h3><p>The billing system groups clean claims for transmission—often daily or several times daily. The electronic healthcare claim is commonly an <strong>837</strong> transaction. A batch can contain many patients and payers, while each claim remains independently traceable.</p><p class="micro">Output: a transmission record with a submitted date, payer route, and control number.</p></article>
+          <article class="stage" data-step="06"><h3>Transmission acknowledgments and status</h3><p>The clinic first learns whether the file and claim were accepted for processing, not whether they will be paid. Staff monitor acknowledgments, payer portal status, and claim-status responses. Unacknowledged claims can become a serious “lost claim” risk.</p><p class="micro">Output: accepted for payer adjudication, rejected for correction, or escalated for follow-up.</p></article>
+        </div>
+
+        <div class="callout"><div class="mark">!</div><p><strong>Code choice is fact-specific.</strong> The categories above are deliberately broad. Actual coding depends on the documented treatment, coding guidance, payer contract, coverage policy, and setting of care. A scheduled drug does not by itself establish a billable claim.</p></div>
+      </section>
+
+      <section id="routing">
+        <div class="section-head">
+          <div><span class="number">04</span><h2>Clearinghouse versus payer portal</h2></div>
+          <p class="section-copy">These are complementary, not interchangeable. The clearinghouse is typically the electronic traffic hub; the payer portal is often the payer-specific research and exception workspace.</p>
+        </div>
+        <div class="compare">
+          <div>
+            <p class="eyebrow">Clearinghouse</p><h3>Routes and validates transactions at scale</h3>
+            <ul>
+              <li>Receives claim batches from the billing system and checks technical format and many front-end rules.</li>
+              <li>Routes each claim to the appropriate payer or network gateway.</li>
+              <li>Returns acknowledgments and may return payer claim-status or remittance files.</li>
+              <li>Lets a billing team monitor rejections and transmission history across many payers.</li>
+            </ul>
+            <p class="kicker">It does not make the coverage or payment decision.</p>
+          </div>
+          <div>
+            <p class="eyebrow">Payer portal</p><h3>Exposes the payer’s own view of the claim</h3>
+            <ul>
+              <li>Shows detailed eligibility, authorization, claim, remit, and appeal information for that payer.</li>
+              <li>May support attachments, corrected claims, reconsiderations, and secure messages.</li>
+              <li>Is frequently used to research a denial or a claim that appears stalled.</li>
+              <li>Can differ widely in data quality and workflow from one payer to another.</li>
+            </ul>
+            <p class="kicker">It is often the final source for payer-specific detail.</p>
+          </div>
+        </div>
+        <div class="table-wrap" style="margin-top:22px">
+          <table>
+            <thead><tr><th>Message or signal</th><th>What it confirms</th><th>What it does not confirm</th><th>Typical next action</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Transmission acknowledgement</strong><br><span class="tag edi">TA1 / similar</span></td><td>The file was structurally received by the next party.</td><td>That each patient claim is accepted or payable.</td><td>Fix an envelope / interchange problem if it fails.</td></tr>
+              <tr><td><strong>Claim acknowledgement</strong><br><span class="tag edi">999 / 277CA</span></td><td>The claim is accepted or rejected at a front-end processing stage.</td><td>That the payer will pay it.</td><td>Correct front-end rejections; monitor accepted claims through adjudication.</td></tr>
+              <tr><td><strong>Claim status</strong><br><span class="tag edi">276 / 277</span></td><td>Where the payer reports the claim is in its process.</td><td>Final payment amount until adjudication completes.</td><td>Work aged or pended claims; provide requested information if applicable.</td></tr>
+              <tr><td><strong>ERA and EFT</strong><br><span class="tag edi">835 + bank deposit</span></td><td>How the payer adjudicated the claim and the amount paid.</td><td>That all cash was posted or all patient money is settled.</td><td>Post remit, apply payment and adjustments, bill patient or work an exception.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="adjudication">
+        <div class="section-head">
+          <div><span class="number">05</span><h2>Adjudication turns a charge into a payer decision</h2></div>
+          <p class="section-copy">The payer compares the submitted claim with the member’s coverage, prior authorization, medical policy, benefits accumulated to date, and its contract with the clinic.</p>
+        </div>
+        <div class="status-grid">
+          <article class="status-card"><h3><span class="dot"></span>Paid as expected</h3><p>The remittance indicates allowed amount, payer payment, contractual adjustment, and any patient responsibility. The account moves from insurance AR to the remaining patient balance, if any.</p></article>
+          <article class="status-card rework"><h3><span class="dot"></span>Pended or partially paid</h3><p>Some lines may need records, an authorization update, coordination-of-benefits work, or an underpayment review. The unpaid portion remains in insurance AR or a review queue.</p></article>
+          <article class="status-card issue"><h3><span class="dot"></span>Denied</h3><p>The payer processed the claim but did not pay a line or claim as submitted. The remittance reason and payer policy determine whether it is corrected, appealed, written off, or billed to a responsible party.</p></article>
+        </div>
+
+        <div class="balance-map" style="margin-top:22px">
+          <div class="balance-box soft-blue"><h3>Before adjudication</h3><p>The claim’s billed charge is on the ledger. The expected collectible amount usually sits in <strong>insurance AR</strong>, while any pre-service payment is held as a credit or deposit.</p><b>Insurance AR is provisional</b></div>
+          <div class="balance-arrow">→</div>
+          <div class="balance-box soft-mint"><h3>ERA is posted</h3><p>The remit allocates the billed charge into payer payment, contractual adjustment, denial or other adjustment, and patient responsibility.</p><b>The ledger gains a payer decision</b></div>
+          <div class="balance-arrow">→</div>
+          <div class="balance-box soft-sand"><h3>After adjudication</h3><p>The payer balance is resolved or worked further. The patient owes only the adjudicated responsibility less any deposit already applied.</p><b>Patient AR becomes final enough to bill</b></div>
+        </div>
+
+        <div class="example" style="margin-top:22px">
+          <div class="example-head"><h3>Worked example: an infusion claim and its ledger</h3><p>Illustrative amounts only; actual benefits and contracted rates vary by payer, plan, and service.</p></div>
+          <div class="money-grid">
+            <div class="money-main">
+              <div class="money-steps">
+                <div class="money-step"><span class="circle">1</span><span>Charges recorded for drug and administration</span><b>$7,600 billed</b></div>
+                <div class="money-step"><span class="circle">2</span><span>Payer’s contracted / allowed amount</span><b>$3,800 allowed</b></div>
+                <div class="money-step"><span class="circle">3</span><span>Contractual adjustment (not a patient bill)</span><b>− $3,800</b></div>
+                <div class="money-step"><span class="circle">4</span><span>Payer payment sent by EFT</span><b>$2,800 paid</b></div>
+                <div class="money-step"><span class="circle">5</span><span>Adjudicated patient responsibility</span><b>$1,000</b></div>
+              </div>
+            </div>
+            <aside class="money-side">
+              <h4>What the billing ledger should show</h4>
+              <div class="formula">$7,600 charge<br>− $3,800 contractual adjustment<br>− $2,800 payer payment<br>= <strong>$1,000 patient responsibility</strong></div>
+              <p style="color:#506d87;font-size:.86rem">If the patient paid a $600 pre-service deposit, it is applied only after the remit is posted.</p>
+              <div class="final">Patient balance to bill: $400</div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section id="patient">
+        <div class="section-head">
+          <div><span class="number">06</span><h2>Patient billing: estimate first, reconcile later</h2></div>
+          <p class="section-copy">For expensive infusion therapy, clinics often discuss and collect an estimated amount before service. The estimate is useful, but it is not the final payer determination.</p>
+        </div>
+        <div class="two-col">
+          <article class="card soft-sand"><div class="icon" style="color:#915b00;background:#ffe9b6">A</div><h3>Pre-service estimate</h3><p>Financial-clearance or front-desk staff combine plan benefit information, deductible and out-of-pocket status, expected codes/units, the clinic’s expected allowed amount, authorization status, and the clinic’s collection policy.</p>
+            <ul><li>It may produce a copay, a deposit request, a payment plan offer, or a financial-assistance discussion.</li><li>It can be wrong because other claims may process first, treatment details may change, or the payer may apply a different rule or allowed amount.</li><li>A payment received at this point should normally remain identifiable as a patient credit until the final responsibility is known.</li></ul>
+          </article>
+          <article class="card soft-mint"><div class="icon" style="color:#087b73;background:#d2f1eb">B</div><h3>Post-adjudication patient statement</h3><p>Once the ERA is posted, the system applies the patient deposit, calculates the remaining patient balance, and creates a statement or payment request according to the clinic’s policy.</p>
+            <ul><li>If the deposit was too low, the clinic bills the remaining balance or starts a payment plan.</li><li>If it was too high, the account carries a credit, applies it to other valid balances, or triggers a refund under policy.</li><li>Staff must handle disputes, returned mail, installment plans, and collections escalation with documented notes.</li></ul>
+          </article>
+        </div>
+        <div class="panel" style="margin-top:22px">
+          <h3>Why estimates and final bills diverge</h3>
+          <div class="quick-grid" style="margin-top:17px">
+            <article class="quick-card"><span class="num">↔</span><h3>Benefits move</h3><p>Another provider’s claim may use deductible or out-of-pocket benefits before this claim adjudicates.</p></article>
+            <article class="quick-card"><span class="num">≠</span><h3>Care changes</h3><p>The actual dose, units, add-on services, or diagnosis can differ from the scheduled treatment.</p></article>
+            <article class="quick-card"><span class="num">%</span><h3>Allowed amounts differ</h3><p>The payer’s final contract calculation may not match the clinic’s estimation table.</p></article>
+            <article class="quick-card"><span class="num">?</span><h3>Coverage rules apply</h3><p>A payer may apply authorization, medical-necessity, coordination-of-benefits, or network rules unexpectedly.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="exceptions">
+        <div class="section-head">
+          <div><span class="number">07</span><h2>Rejections, denials, and the human work behind them</h2></div>
+          <p class="section-copy">A clean first submission is valuable because exceptions introduce research, communication, document gathering, correction, and deadline management.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Outcome</th><th>Where it occurs</th><th>Meaning</th><th>Typical work to resolve it</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Front-end rejection</strong></td><td>Billing system, clearinghouse, or payer intake</td><td>The claim was not accepted into normal adjudication, often due to data, format, coverage, or coding edits.</td><td>Correct patient demographics, payer ID, subscriber data, modifier, authorization, diagnosis, or other edit; re-submit and confirm acceptance.</td></tr>
+              <tr><td><strong>Payer denial</strong></td><td>After payer adjudication</td><td>The payer processed the claim and decided not to pay all or part of it.</td><td>Read remit reason codes and portal detail; obtain records; correct and rebill, request reconsideration, appeal, shift liability only if appropriate, or adjust under policy.</td></tr>
+              <tr><td><strong>Underpayment</strong></td><td>After ERA posting</td><td>The payer paid less than expected under the contract or benefit calculation.</td><td>Compare remit to contract terms and expected units; validate coding; contact payer or file a payment dispute within the payer’s window.</td></tr>
+              <tr><td><strong>No response / aged claim</strong></td><td>During follow-up</td><td>No remit or reliable status arrived within the clinic’s follow-up threshold.</td><td>Trace clearinghouse acceptance, check payer portal, call payer, document reference number, and refile or escalate before timely-filing limits.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="two-col" style="margin-top:22px">
+          <article class="card soft-rose"><div class="icon" style="color:#b53b45;background:#ffdfe4">↺</div><h3>Accounts receivable (AR) work queues</h3><p>Billing teams sort outstanding balances by payer, age, dollar amount, denial reason, treatment type, and next action. A collector’s work often includes reviewing EOB/ERA details, logging into portals, making calls, uploading records, coordinating with clinical staff, filing appeals, and documenting every attempt.</p></article>
+          <article class="card soft-lavender"><div class="icon" style="color:#6545a5;background:#e7dfff">✓</div><h3>What “resolved” means</h3><p>A claim is not necessarily resolved when cash arrives. The account needs a supported disposition for every balance: payer payment, contractual adjustment, patient responsibility, valid secondary payment, corrected claim in process, approved write-off, refund, or another documented outcome.</p></article>
+        </div>
+      </section>
+
+      <section id="reconciliation">
+        <div class="section-head">
+          <div><span class="number">08</span><h2>Reconciliation keeps records and cash aligned</h2></div>
+          <p class="section-copy">Reconciliation is a series of control checks—not just a monthly accounting task. It asks whether the clinic’s clinical record, claim ledger, remittance detail, and bank deposits agree.</p>
+        </div>
+        <div class="panel">
+          <div class="two-col">
+            <article><h3>Daily / ongoing controls</h3><ul style="color:var(--muted);padding-left:19px"><li>Compare infusion schedules and completed administrations to captured charges.</li><li>Confirm submitted batches received acknowledgments and no rejected claims were left behind.</li><li>Match ERA payments to EFT trace numbers and deposit dates.</li><li>Match card settlements, checks, and lockbox files to patient-account postings.</li><li>Review unapplied cash, credit balances, and duplicate payments.</li></ul></article>
+            <article><h3>Periodic financial controls</h3><ul style="color:var(--muted);padding-left:19px"><li>Reconcile billing-system cash totals to the bank and general ledger.</li><li>Review contractual adjustments and write-offs for correct authorization.</li><li>Investigate payer underpayments, reversals, recoupments, and offsets.</li><li>Review refunds and patient credit balances against clinic policy.</li><li>Validate that AR aging and revenue reports use consistent cut-off dates.</li></ul></article>
+          </div>
+        </div>
+        <div class="callout"><div class="mark">$</div><p><strong>ERA and EFT must be paired.</strong> An ERA explains how a payer applied a payment; the EFT is the cash movement. The same payment may cover many claims, include offsets or recoupments, or arrive on a different day from the remit file.</p></div>
+      </section>
+
+      <section id="reporting">
+        <div class="section-head">
+          <div><span class="number">09</span><h2>Reporting turns workflow into management visibility</h2></div>
+          <p class="section-copy">Useful reports connect operational bottlenecks to financial impact. They are usually segmented by payer, location, service line, treatment type, and responsible work team.</p>
+        </div>
+        <div class="report-grid">
+          <article class="metric"><b>Charge lag</b><p>Days from treatment to charge entry. Long lag delays every downstream step.</p></article>
+          <article class="metric"><b>Clean-claim / first-pass rate</b><p>Share of claims accepted and paid without avoidable correction or rework.</p></article>
+          <article class="metric"><b>Denial rate &amp; reason mix</b><p>Denials as a share of claims or dollars, grouped by root cause and payer.</p></article>
+          <article class="metric"><b>Days in AR</b><p>How long outstanding receivables remain open, with aging buckets such as 0–30, 31–60, 61–90, and 90+ days.</p></article>
+          <article class="metric"><b>Net collection rate</b><p>Collected allowed revenue relative to collectible revenue after contract adjustments.</p></article>
+          <article class="metric"><b>Authorization performance</b><p>Scheduled cases with valid, matching authorization versus cases delayed or denied for authorization issues.</p></article>
+          <article class="metric"><b>Patient estimate variance</b><p>Difference between pre-service estimated responsibility and final adjudicated responsibility.</p></article>
+          <article class="metric"><b>Credit &amp; unapplied cash</b><p>Patient or payer money received but not yet correctly applied, refunded, or resolved.</p></article>
+        </div>
+      </section>
+
+      <section id="vendor">
+        <div class="section-head">
+          <div><span class="number">10</span><h2>Where a billing vendor’s scope typically begins and ends</h2></div>
+          <p class="section-copy">Contracts vary. The provider retains the patient relationship, clinical documentation, compliance accountability, and key financial policies—even when a vendor performs much of the operational work.</p>
+        </div>
+        <div class="compare">
+          <div>
+            <p class="eyebrow">Basic billing vendor</p><h3>Usually focused on claims after service</h3>
+            <ul>
+              <li>May receive finalized charges from the clinic, create claims, submit them, post remittances, and follow up AR.</li>
+              <li>Often relies on the provider’s staff for eligibility, authorization, patient estimates, documentation fixes, and front-desk collection.</li>
+              <li>May flag coding or documentation issues, but clinic personnel often supply the correction.</li>
+              <li>Patient statements and inbound patient calls may be inside or outside scope depending on the agreement.</li>
+            </ul>
+          </div>
+          <div>
+            <p class="eyebrow">Full-service RCM vendor</p><h3>May operate from pre-service through patient balance</h3>
+            <ul>
+              <li>Can support benefits verification, authorization tracking, financial clearance, estimates, collections, coding, charge review, claims, and AR.</li>
+              <li>May run patient financial communications, payment processing, statements, payment plans, and post-adjudication follow-up.</li>
+              <li>Still depends on timely, accurate clinical documentation and on provider decisions about policy, exceptions, and patient experience.</li>
+              <li>Needs clear handoffs for clinical questions, refunds, write-offs, appeals, and escalation authority.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="table-wrap" style="margin-top:22px">
+          <table>
+            <thead><tr><th>Activity</th><th>Provider typically owns</th><th>Vendor may operationally perform</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Clinical record and treatment decision</strong></td><td>Orders, care delivered, documentation completeness, clinical signatures.</td><td>Request missing documentation or route questions; does not create clinical facts.</td></tr>
+              <tr><td><strong>Financial policy</strong></td><td>Deposit thresholds, payment-plan policy, refund and write-off authority, exception rules.</td><td>Apply approved policy, collect payments, administer plans, and surface exceptions.</td></tr>
+              <tr><td><strong>Claim and AR operations</strong></td><td>Oversight, access decisions, escalations, compliance accountability.</td><td>Create and submit claims, post remits, call payers, manage denials and aging.</td></tr>
+              <tr><td><strong>Patient relationship</strong></td><td>Care relationship, sensitive disputes, service recovery, final policy decisions.</td><td>Communicate estimates, statements, payment requests, and routine billing support when in scope.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="glossary">
+        <div class="section-head">
+          <div><span class="number">11</span><h2>Glossary</h2></div>
+          <p class="section-copy">A compact vocabulary for reading billing screens, payer files, and workflow reports.</p>
+        </div>
+        <div class="panel">
+          <dl class="glossary">
+            <div class="term"><dt>Adjudication</dt><dd>The payer’s processing of a claim to determine coverage, allowed amount, payer payment, adjustments, and patient responsibility.</dd></div>
+            <div class="term"><dt>Allowed amount</dt><dd>The amount recognized under a payer’s contract or plan rules—not necessarily the clinic’s billed charge.</dd></div>
+            <div class="term"><dt>AR (accounts receivable)</dt><dd>Money the clinic expects to collect, separated into insurer AR, patient AR, and sometimes other responsible parties.</dd></div>
+            <div class="term"><dt>Charge capture</dt><dd>Converting documented services, drugs, supplies, and administration into billable charge lines.</dd></div>
+            <div class="term"><dt>Claim scrubber</dt><dd>A rules-based pre-submission check that identifies data, coding, and payer-rule issues.</dd></div>
+            <div class="term"><dt>Contractual adjustment</dt><dd>The difference between a billed charge and the allowed amount that the clinic agrees not to collect under contract; it is not normally patient responsibility.</dd></div>
+            <div class="term"><dt>ERA / 835</dt><dd>Electronic Remittance Advice: the payer’s electronic explanation of claim adjudication and payment.</dd></div>
+            <div class="term"><dt>EFT</dt><dd>Electronic funds transfer: the payer’s actual deposit of money into the clinic’s account.</dd></div>
+            <div class="term"><dt>EOB</dt><dd>Explanation of Benefits: a member-facing summary of how the payer processed a claim; it is not itself a bill.</dd></div>
+            <div class="term"><dt>Prior authorization</dt><dd>Payer approval required before certain services or drugs are covered, generally tied to a defined scope and time period.</dd></div>
+            <div class="term"><dt>Rejection</dt><dd>A claim not accepted into normal processing, usually because it failed a front-end technical or data edit.</dd></div>
+            <div class="term"><dt>Denial</dt><dd>A payer decision after processing to not pay all or part of a claim as submitted.</dd></div>
+            <div class="term"><dt>Timely filing</dt><dd>The deadline by which a payer requires the claim or corrected claim to be received.</dd></div>
+            <div class="term"><dt>Unapplied cash</dt><dd>Money received but not yet correctly matched to the intended patient account, claim, or charge line.</dd></div>
+          </dl>
+        </div>
+      </section>
+    </main>
+    <footer><div class="wrap">Prepared as a general current-state workflow explainer. Specific payer requirements, coding rules, contracts, and patient-financial policies vary materially.</div></footer>
+  </body>
+</html>
