@@ -54,7 +54,7 @@ Terms used below, defined once:
         - Per-clinic / per-EMR navigation instructions, since builds and templates differ between installs of the same EMR.
         - Output is a *structured encounter record*, not a claim: what drug was given, its NDC (the manufacturer's product ID for that exact vial/package), the dose, how much was given and how much was thrown away, the route, the start and stop times of the infusion, the diagnosis, who administered it, where, and whether the chart was signed.
         - Every field carries a source citation (screen / element / screenshot region) so a human can check it without re-driving the browser.
-        - The critical numbers — drug, NDC, dose, units, start/stop times, waste — get read a second time, independently. If the two reads disagree, a human decides. We do not let the model break the tie.
+        - The critical numbers — drug, NDC, dose, units, start/stop times, waste — (maybe later) do reads multiple times, and see if they disagree.
         - Why this is its own stage: if the agent misreads a fact (40mg as 400mg, or grabs last month's visit), the resulting claim is perfectly well-formed and simply wrong. Nothing downstream catches that — the format checks pass, the coding looks right. It gets paid, and then we owe the money back. That's a different and worse failure than a claim that gets rejected.
     2. **Code** — turn the encounter record into billable claim lines.
         - Separate stage from extract so we can redo the coding without re-driving the browser, and redo the extraction without re-arguing the coding. Different failure modes, different test sets.
