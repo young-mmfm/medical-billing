@@ -3,3 +3,4 @@ out/
 .env
 *.har
 .env
+cli_outputs/
