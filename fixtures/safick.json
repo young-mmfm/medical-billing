@@ -1,0 +1,94 @@
+{
+  "extraction": {
+    "clinic": "demo-openemr",
+    "baseUrl": "https://demo.openemr.io/openemr",
+    "pid": "24",
+    "searchTerm": "Safick",
+    "nameMatchedSearchTerm": true
+  },
+  "demographics": {
+    "patientName": {
+      "value": "Aamir Safick",
+      "sourceText": "Aamir Safick",
+      "source": "#text_fname[data-value] + #text_lname[data-value]"
+    },
+    "dateOfBirth": {
+      "value": "2009-10-12",
+      "sourceText": "2009-10-12",
+      "source": "#text_DOB"
+    },
+    "sex": {
+      "value": "Male",
+      "sourceText": "Male",
+      "source": "#text_sex"
+    },
+    "externalId": {
+      "value": "24",
+      "sourceText": "24",
+      "source": "#text_pubpid"
+    }
+  },
+  "insurance": {
+    "type": "primary",
+    "carrier": {
+      "value": "Aekna",
+      "sourceText": "Aekna",
+      "source": "#primary .insurer address strong"
+    },
+    "plan": {
+      "value": "Care First Plan",
+      "sourceText": "Care First Plan",
+      "source": "#primary .list-group-item :text(\"Plan Name\")"
+    },
+    "policyNumber": {
+      "value": "3651285368",
+      "sourceText": "3651285368",
+      "source": "#primary .list-group-item :text(\"Policy Number\")"
+    },
+    "groupNumber": {
+      "value": "36565706",
+      "sourceText": "36565706",
+      "source": "#primary .list-group-item :text(\"Group Number\")"
+    },
+    "effectiveDate": {
+      "value": "2026-01-01",
+      "sourceText": "Primary Insurance from 2026-01-01 until 2027-01-01",
+      "source": "#primary .text-primary"
+    }
+  },
+  "encounters": [
+    {
+      "encounterId": "95",
+      "date": {
+        "value": "2026-09-30",
+        "sourceText": "2026-09-30",
+        "source": "tr#95~2026-09-30 td:nth-child(1)"
+      },
+      "provider": {
+        "value": "Smith, Billy",
+        "sourceText": "Smith, Billy",
+        "source": "tr#95~2026-09-30 td:nth-child(4)"
+      },
+      "reason": {
+        "value": null,
+        "sourceText": "",
+        "source": "tr#95~2026-09-30 td:nth-child(3)"
+      },
+      "cptCodes": {
+        "value": [],
+        "sourceText": "",
+        "source": "tr#95~2026-09-30 td:nth-child(5)"
+      },
+      "diagnosisCodes": {
+        "value": [],
+        "sourceText": "",
+        "source": "tr#95~2026-09-30 td:nth-child(5)"
+      },
+      "insuranceOnVisit": {
+        "value": "Primary: Aekna",
+        "sourceText": "Primary: Aekna",
+        "source": "tr#95~2026-09-30 td:nth-child(10)"
+      }
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "extraction": {
+    "clinic": "demo-openemr",
+    "baseUrl": "https://demo.openemr.io/openemr",
+    "pid": "1",
+    "searchTerm": "Belford",
+    "nameMatchedSearchTerm": true
+  },
+  "demographics": {
+    "patientName": {
+      "value": "Phil Belford",
+      "sourceText": "Phil Belford",
+      "source": "#text_fname[data-value] + #text_lname[data-value]"
+    },
+    "dateOfBirth": {
+      "value": "1972-02-09",
+      "sourceText": "1972-02-09",
+      "source": "#text_DOB"
+    },
+    "sex": {
+      "value": "Male",
+      "sourceText": "Male",
+      "source": "#text_sex"
+    },
+    "externalId": {
+      "value": "1",
+      "sourceText": "1",
+      "source": "#text_pubpid"
+    }
+  },
+  "insurance": {
+    "type": "primary",
+    "carrier": {
+      "value": "Aekna",
+      "sourceText": "Aekna",
+      "source": "#primary .insurer address strong"
+    },
+    "plan": {
+      "value": "Bad Plan",
+      "sourceText": "Bad Plan",
+      "source": "#primary .list-group-item :text(\"Plan Name\")"
+    },
+    "policyNumber": {
+      "value": "555",
+      "sourceText": "555",
+      "source": "#primary .list-group-item :text(\"Policy Number\")"
+    },
+    "groupNumber": {
+      "value": "444",
+      "sourceText": "444",
+      "source": "#primary .list-group-item :text(\"Group Number\")"
+    },
+    "effectiveDate": {
+      "value": "2012-02-08",
+      "sourceText": "Primary Insurance from 2012-02-08 until Present",
+      "source": "#primary .text-primary"
+    }
+  },
+  "encounters": [
+    {
+      "encounterId": "196",
+      "date": {
+        "value": "2026-08-31",
+        "sourceText": "2026-08-31",
+        "source": "tr#196~2026-08-31 td:nth-child(1)"
+      },
+      "provider": {
+        "value": "Smith, Billy",
+        "sourceText": "Smith, Billy",
+        "source": "tr#196~2026-08-31 td:nth-child(4)"
+      },
+      "reason": {
+        "value": null,
+        "sourceText": "",
+        "source": "tr#196~2026-08-31 td:nth-child(3)"
+      },
+      "cptCodes": {
+        "value": [],
+        "sourceText": "",
+        "source": "tr#196~2026-08-31 td:nth-child(5)"
+      },
+      "diagnosisCodes": {
+        "value": [],
+        "sourceText": "",
+        "source": "tr#196~2026-08-31 td:nth-child(5)"
+      },
+      "insuranceOnVisit": {
+        "value": "Primary: Aekna",
+        "sourceText": "Primary: Aekna",
+        "source": "tr#196~2026-08-31 td:nth-child(10)"
+      }
+    },
+    {
+      "encounterId": "5",
+      "date": {
+        "value": "2014-02-01",
+        "sourceText": "2014-02-01",
+        "source": "tr#5~2014-02-01 td:nth-child(1)"
+      },
+      "provider": {
+        "value": "Smith, Billy",
+        "sourceText": "Smith, Billy",
+        "source": "tr#5~2014-02-01 td:nth-child(4)"
+      },
+      "reason": {
+        "value": "Sad VitalsSOAP",
+        "sourceText": "Sad VitalsSOAP",
+        "source": "tr#5~2014-02-01 td:nth-child(3)"
+      },
+      "cptCodes": {
+        "value": [
+          "99202"
+        ],
+        "sourceText": "CPT4 - 99202ICD9 - 296.20",
+        "source": "tr#5~2014-02-01 td:nth-child(5)"
+      },
+      "diagnosisCodes": {
+        "value": [
+          "296.20"
+        ],
+        "sourceText": "CPT4 - 99202ICD9 - 296.20",
+        "source": "tr#5~2014-02-01 td:nth-child(5)"
+      },
+      "insuranceOnVisit": {
+        "value": "Primary: Aekna",
+        "sourceText": "Primary: Aekna",
+        "source": "tr#5~2014-02-01 td:nth-child(10)"
+      }
+    }
+  ]
+}

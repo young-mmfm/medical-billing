@@ -113,7 +113,7 @@ async function main() {
     );
 
     // 4. Read the visit history.
-    await sh.act("click the History or Visit History tab for this patient");
+    await sh.act("click the Visit History tab for this patient");
     await settle(page);
     const enc = await sh.extract(
       "This is a visit history table. For every encounter row extract the date " +

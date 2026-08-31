@@ -1,0 +1,60 @@
+{
+  "extraction": {
+    "clinic": "demo-openemr",
+    "baseUrl": "https://demo.openemr.io/openemr",
+    "pid": "19",
+    "searchTerm": "Test_Cannon",
+    "nameMatchedSearchTerm": true
+  },
+  "demographics": {
+    "patientName": {
+      "value": "Rebecca Test_Cannon",
+      "sourceText": "Rebecca Test_Cannon",
+      "source": "#text_fname[data-value] + #text_lname[data-value]"
+    },
+    "dateOfBirth": {
+      "value": "1962-07-15",
+      "sourceText": "1962-07-15",
+      "source": "#text_DOB"
+    },
+    "sex": {
+      "value": "Female",
+      "sourceText": "Female",
+      "source": "#text_sex"
+    },
+    "externalId": {
+      "value": "19",
+      "sourceText": "19",
+      "source": "#text_pubpid"
+    }
+  },
+  "insurance": {
+    "type": "primary",
+    "carrier": {
+      "value": "Self-Pay",
+      "sourceText": "Self-Pay",
+      "source": "#primary .insurer address strong"
+    },
+    "plan": {
+      "value": null,
+      "sourceText": "",
+      "source": "#primary .list-group-item :text(\"Plan Name\")"
+    },
+    "policyNumber": {
+      "value": null,
+      "sourceText": "",
+      "source": "#primary .list-group-item :text(\"Policy Number\")"
+    },
+    "groupNumber": {
+      "value": null,
+      "sourceText": "",
+      "source": "#primary .list-group-item :text(\"Group Number\")"
+    },
+    "effectiveDate": {
+      "value": null,
+      "sourceText": "Primary Insurance until Present",
+      "source": "#primary .text-primary"
+    }
+  },
+  "encounters": []
+}
